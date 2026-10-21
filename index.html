@@ -3,28 +3,115 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Durger King</title>
+  <title>Durger King - Premium Menu</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: sans-serif; margin: 0; padding: 12px;
-           background: var(--tg-theme-bg-color, #fff);
-           color: var(--tg-theme-text-color, #000); }
-    h2 { margin: 4px 0 12px; }
-    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .item { text-align: center; font-size: 14px; }
-    .emoji { font-size: 42px; }
-    .controls { margin-top: 6px; }
-    button.b { border: 0; border-radius: 6px; padding: 6px 10px;
-               font-size: 16px; color: #fff; background: #f5a623; }
+    :root {
+      --bg-color: var(--tg-theme-bg-color, #f4f5f7);
+      --text-color: var(--tg-theme-text-color, #222);
+      --hint-color: var(--tg-theme-hint-color, #707579);
+      --button-color: var(--tg-theme-button-color, #ff6b00);
+      --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+      --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 12px;
+      background: var(--bg-color);
+      color: var(--text-color);
+      padding-bottom: 80px;
+    }
+
+    h2 { margin: 4px 0 12px; font-size: 22px; font-weight: 700; }
+
+    /* Qidiruv va kategoriyalar */
+    .search-box {
+      width: 100%;
+      padding: 10px 14px;
+      box-sizing: border-box;
+      border-radius: 10px;
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      background: var(--card-bg);
+      color: var(--text-color);
+      font-size: 15px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .categories::-webkit-scrollbar { display: none; }
+
+    .cat-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      background: var(--card-bg);
+      color: var(--text-color);
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .cat-btn.active {
+      background: var(--button-color);
+      color: var(--button-text-color);
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    /* Mahsulotlar Grid dizayni */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .item {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .emoji { font-size: 48px; margin-bottom: 6px; }
+    .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .price { color: var(--button-color); font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+    
+    .controls { display: flex; align-items: center; justify-content: center; gap: 8px; }
+    button.b {
+      border: 0; border-radius: 8px; padding: 6px 12px;
+      font-size: 14px; font-weight: 600; color: #fff; background: var(--button-color);
+      cursor: pointer;
+    }
     button.minus { background: #e74c3c; }
-    .qty { display: inline-block; min-width: 20px; }
-    .row { display: flex; justify-content: space-between; padding: 10px 0;
-           border-bottom: 1px solid #8884; }
-    .head { display: flex; justify-content: space-between; align-items: center; }
-    .link { color: #2ea043; cursor: pointer; }
-    textarea { width: 100%; box-sizing: border-box; margin-top: 14px;
-               padding: 8px; font-size: 15px; border-radius: 6px;
-               border: 1px solid #8886; min-height: 70px; }
+    .qty { font-weight: 600; font-size: 15px; min-width: 20px; }
+
+    /* Buyurtma sahifasi */
+    .row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid rgba(128,128,128,0.2);
+    }
+    .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .link { color: var(--button-color); cursor: pointer; font-weight: 600; }
+    
+    textarea {
+      width: 100%; box-sizing: border-box; margin-top: 16px;
+      padding: 12px; font-size: 15px; border-radius: 10px;
+      border: 1px solid rgba(128, 128, 128, 0.3);
+      background: var(--card-bg); color: var(--text-color);
+      min-height: 80px; outline: none; resize: none;
+    }
   </style>
 </head>
 <body>
@@ -35,23 +122,61 @@
     tg.ready();
     tg.expand();
 
-    // Narxlar sentda: 499 = $4.99
+    // Restoran darajasidagi kengaytirilgan menyu (narxlar so'mda)
     const items = [
-      { id: "burger", name: "Burger", emoji: "🍔", price: 499 },
-      { id: "fries",  name: "Fries",  emoji: "🍟", price: 149 },
-      { id: "taco",   name: "Taco",   emoji: "🌮", price: 399 },
-      { id: "pizza",  name: "Pizza",  emoji: "🍕", price: 799 },
-      { id: "donut",  name: "Donut",  emoji: "🍩", price: 149 },
-      { id: "coke",   name: "Coke",   emoji: "🥤", price: 149 },
+      // Burgerlar
+      { id: "king_burger", cat: "burger", name: "King Double Burger", emoji: "🍔", price: 38000 },
+      { id: "cheeseburger", cat: "burger", name: "Classic Cheeseburger", emoji: "🧀", price: 26000 },
+      { id: "chicken_burger", cat: "burger", name: "Crispy Chicken Burger", emoji: "🍗", price: 28000 },
+      { id: "mushroom_burger", cat: "burger", name: "Mushroom Swiss Burger", emoji: "🍄", price: 34000 },
+      { id: "bbq_burger", cat: "burger", name: "BBQ Bacon Burger", emoji: "🥓", price: 36000 },
+
+      // Setlar
+      { id: "big_set", cat: "sets", name: "Mega King Set", emoji: "👑", price: 65000 },
+      { id: "junior_set", cat: "sets", name: "Junior Box Set", emoji: "🎁", price: 42000 },
+      { id: "chicken_set", cat: "sets", name: "Chicken Wings Set", emoji: "🔥", price: 55000 },
+
+      // Fri va Gazaklar
+      { id: "fries_big", cat: "snacks", name: "French Fries (Big)", emoji: "🍟", price: 12000 },
+      { id: "nuggets", cat: "snacks", name: "Chicken Nuggets (9 pcs)", emoji: "🐔", price: 25000 },
+      { id: "onion_rings", cat: "snacks", name: "Onion Rings", emoji: "🧅", price: 15000 },
+      { id: "cheese_sticks", cat: "snacks", name: "Mozzarella Sticks", emoji: "🧀", price: 22000 },
+
+      // Ichimliklar
+      { id: "coca_cola", cat: "drinks", name: "Coca-Cola 0.5L", emoji: "🥤", price: 9000 },
+      { id: "fanta", cat: "drinks", name: "Fanta 0.5L", emoji: "🍊", price: 9000 },
+      { id: "sprite", cat: "drinks", name: "Sprite 0.5L", emoji: "❄️", price: 9000 },
+      { id: "americano", cat: "drinks", name: "Hot Americano", emoji: "☕", price: 14000 },
+
+      // Souslar
+      { id: "cheese_sauce", cat: "sauces", name: "Cheese Sauce", emoji: "🧀", price: 4000 },
+      { id: "garlic_sauce", cat: "sauces", name: "Garlic Sauce", emoji: "🧄", price: 4000 },
+      { id: "bbq_sauce", cat: "sauces", name: "BBQ Sauce", emoji: "🍅", price: 4000 },
+
+      // Desertlar
+      { id: "ice_cream", cat: "desserts", name: "King Ice Cream", emoji: "🍦", price: 15000 },
+      { id: "donut", cat: "desserts", name: "Chocolate Donut", emoji: "🍩", price: 12000 },
+      { id: "cheesecake", cat: "desserts", name: "Strawberry Cheesecake", emoji: "🍰", price: 24000 },
     ];
 
-    const cart = {};       // { burger: 1, fries: 10 }
-    let screen = "menu";   // "menu" yoki "order"
+    const categories = [
+      { id: "all", name: "Barchasi" },
+      { id: "burger", name: "🍔 Burgerlar" },
+      { id: "sets", name: "👑 Setlar" },
+      { id: "snacks", name: "🍟 Gazaklar" },
+      { id: "drinks", name: "🥤 Ichimliklar" },
+      { id: "sauces", name: "🍅 Souslar" },
+      { id: "desserts", name: "🍰 Desertlar" },
+    ];
+
+    const cart = {}; 
+    let screen = "menu"; 
+    let activeCategory = "all";
+    let searchQuery = "";
     const app = document.getElementById("app");
 
-    const money = c => "$" + (c / 100).toFixed(2);
-    const total = () =>
-      items.reduce((s, it) => s + (cart[it.id] || 0) * it.price, 0);
+    const money = c => c.toLocaleString() + " so'm";
+    const total = () => items.reduce((s, it) => s + (cart[it.id] || 0) * it.price, 0);
 
     function change(id, delta) {
       cart[id] = Math.max(0, (cart[id] || 0) + delta);
@@ -64,23 +189,74 @@
       if (s === "menu") renderMenu(); else renderOrder();
     }
 
-    // ---------- 1-ekran: menyu ----------
+    // ---------- 1-ekran: Kengaytirilgan Menyular ----------
     function renderMenu() {
-      app.innerHTML = "<h2>Durger King</h2><div class='grid' id='menu'></div>";
-      const menu = document.getElementById("menu");
-      items.forEach(it => {
+      let html = `
+        <h2>👑 Durger King</h2>
+        <input type="text" class="search-box" id="search" placeholder="Taomlarni qidirish..." value="${searchQuery}">
+        <div class="categories">
+      `;
+
+      categories.forEach(cat => {
+        html += `<button class="cat-btn ${activeCategory === cat.id ? 'active' : ''}" onclick="selectCategory('${cat.id}')">${cat.name}</button>`;
+      });
+      html += `</div><div class='grid' id='menu-grid'></div>`;
+      
+      app.innerHTML = html;
+
+      document.getElementById("search").oninput = (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        renderItemsGrid();
+      };
+
+      renderItemsGrid();
+
+      tg.BackButton.hide();
+      if (total() > 0) {
+        tg.MainButton.setText("SAVATNI KO'RISH · " + money(total()));
+        tg.MainButton.show();
+      } else {
+        tg.MainButton.hide();
+      }
+    }
+
+    function selectCategory(catId) {
+      activeCategory = catId;
+      renderMenu();
+    }
+
+    function renderItemsGrid() {
+      const grid = document.getElementById("menu-grid");
+      grid.innerHTML = "";
+
+      const filtered = items.filter(it => {
+        const matchesCat = activeCategory === "all" || it.cat === activeCategory;
+        const matchesSearch = it.name.toLowerCase().includes(searchQuery);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: span 2; text-align: center; color: var(--hint-color); padding: 30px;">Taom topilmadi 🔍</div>`;
+        return;
+      }
+
+      filtered.forEach(it => {
         const qty = cart[it.id] || 0;
         const div = document.createElement("div");
         div.className = "item";
-        div.innerHTML =
-          "<div class='emoji'>" + it.emoji + "</div>" +
-          "<div>" + it.name + " · " + money(it.price) + "</div>" +
-          "<div class='controls'></div>";
+        div.innerHTML = `
+          <div>
+            <div class='emoji'>${it.emoji}</div>
+            <div class='title'>${it.name}</div>
+            <div class='price'>${money(it.price)}</div>
+          </div>
+          <div class='controls'></div>
+        `;
         const ctr = div.querySelector(".controls");
 
         const plus = document.createElement("button");
         plus.className = "b";
-        plus.textContent = qty === 0 ? "ADD" : "+";
+        plus.textContent = qty === 0 ? "QO'SHISH" : "+";
         plus.onclick = () => change(it.id, 1);
 
         if (qty > 0) {
@@ -90,45 +266,51 @@
           minus.onclick = () => change(it.id, -1);
           const q = document.createElement("span");
           q.className = "qty";
-          q.textContent = " " + qty + " ";
+          q.textContent = qty;
           ctr.append(minus, q, plus);
         } else {
           ctr.append(plus);
         }
-        menu.appendChild(div);
+        grid.appendChild(div);
       });
-
-      tg.BackButton.hide();
-      if (total() > 0) {
-        tg.MainButton.setText("VIEW ORDER · " + money(total()));
-        tg.MainButton.show();
-      } else {
-        tg.MainButton.hide();
-      }
     }
 
-    // ---------- 2-ekran: buyurtma ----------
+    // ---------- 2-ekran: Buyurtma va Izoh ----------
     function renderOrder() {
       let rows = "";
       items.forEach(it => {
         const q = cart[it.id];
         if (q) {
-          rows += "<div class='row'><div><b>" + it.name + "</b> " + q + "x</div>" +
-                  "<div>" + money(q * it.price) + "</div></div>";
+          rows += `
+            <div class='row'>
+              <div><b>${it.name}</b><br><span style="color:var(--hint-color); font-size:13px;">${q} x ${money(it.price)}</span></div>
+              <div style="font-weight:600;">${money(q * it.price)}</div>
+            </div>
+          `;
         }
       });
-      app.innerHTML =
-        "<div class='head'><h2>YOUR ORDER</h2>" +
-        "<span class='link' id='edit'>Edit</span></div>" + rows +
-        "<textarea id='comment' placeholder='Izoh qoldiring...'></textarea>";
-      document.getElementById("edit").onclick = () => setScreen("menu");
+
+      app.innerHTML = `
+        <div class='head'>
+          <h2>🛒 Buyurtma tafsiloti</h2>
+          <span class='link' onclick="setScreen('menu')">O'zgartirish</span>
+        </div>
+        <div style="background:var(--card-bg); border-radius:14px; padding:0 12px; margin-bottom:10px;">
+          ${rows}
+          <div class='row' style="border-bottom:none; font-size:17px; font-weight:bold;">
+            <div>Jami to'lov:</div>
+            <div style="color:var(--button-color);">${money(total())}</div>
+          </div>
+        </div>
+        <textarea id='comment' placeholder='Yetkazib berish bo‘yicha izoh (masalan: Manzil, uy raqami yoki mo‘ljal)...'></textarea>
+      `;
 
       tg.BackButton.show();
-      tg.MainButton.setText("PAY " + money(total()));
+      tg.MainButton.setText("TO'LOV QILISH · " + money(total()));
       tg.MainButton.show();
     }
 
-    // ---------- tugmalar ----------
+    // ---------- Tugmalar hodisalari ----------
     tg.MainButton.onClick(() => {
       if (screen === "menu") {
         setScreen("order");
@@ -137,6 +319,7 @@
         tg.sendData(JSON.stringify({ cart: cart, comment: comment }));
       }
     });
+
     tg.BackButton.onClick(() => setScreen("menu"));
 
     renderMenu();
