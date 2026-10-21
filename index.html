@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Durger King</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 0; padding: 12px;
+           background: var(--tg-theme-bg-color, #fff);
+           color: var(--tg-theme-text-color, #000); }
+    h2 { margin: 4px 0 12px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .item { text-align: center; font-size: 14px; }
+    .emoji { font-size: 42px; }
+    .controls { margin-top: 6px; }
+    button { border: 0; border-radius: 6px; padding: 6px 10px;
+             font-size: 16px; color: #fff; background: #f5a623; }
+    .minus { background: #e74c3c; }
+    .qty { display: inline-block; min-width: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Durger King</h2>
+  <div class="grid" id="menu"></div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Menyu ma'lumotlari. Narxlar markazda (sentda) saqlanadi.
+    const items = [
+      { id: "burger", name: "Burger", emoji: "🍔", price: 499 },
+      { id: "fries",  name: "Fries",  emoji: "🍟", price: 149 },
+      { id: "taco",   name: "Taco",   emoji: "🌮", price: 399 },
+      { id: "pizza",  name: "Pizza",  emoji: "🍕", price: 799 },
+      { id: "donut",  name: "Donut",  emoji: "🍩", price: 149 },
+      { id: "coke",   name: "Coke",   emoji: "🥤", price: 149 },
+    ];
+
+    const cart = {};  // masalan: { burger: 1, fries: 10 }
+
+    function render() {
+      const menu = document.getElementById("menu");
+      menu.innerHTML = "";
+      items.forEach(it => {
+        const qty = cart[it.id] || 0;
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML =
+          '<div class="emoji">' + it.emoji + '</div>' +
+          '<div>' + it.name + ' · $' + (it.price / 100).toFixed(2) + '</div>' +
+          '<div class="controls">' +
+            (qty === 0
+              ? '<button onclick="change(\'' + it.id + '\', 1)">ADD</button>'
+              : '<button class="minus" onclick="change(\'' + it.id + '\', -1)">−</button> ' +
+                '<span class="qty">' + qty + '</span> ' +
+                '<button onclick="change(\'' + it.id + '\', 1)">+</button>') +
+          '</div>';
+        menu.appendChild(div);
+      });
+      updateMainButton();
+    }
+
+    function change(id, delta) {
+      cart[id] = Math.max(0, (cart[id] || 0) + delta);
+      if (cart[id] === 0) delete cart[id];
+      render();
+    }
+
+    function total() {
+      return items.reduce((s, it) => s + (cart[it.id] || 0) * it.price, 0);
+    }
+
+    function updateMainButton() {
+      if (total() > 0) {
+        tg.MainButton.setText("VIEW ORDER · $" + (total() / 100).toFixed(2));
+        tg.MainButton.show();
+      } else {
+        tg.MainButton.hide();
+      }
+    }
+
+    tg.MainButton.onClick(() => {
+      alert("Savat: " + JSON.stringify(cart));  // keyingi bosqichda botga yuboramiz
+    });
+
+    render();
+  </script>
+</body>
+</html>
