@@ -14,22 +14,28 @@
     .item { text-align: center; font-size: 14px; }
     .emoji { font-size: 42px; }
     .controls { margin-top: 6px; }
-    button { border: 0; border-radius: 6px; padding: 6px 10px;
-             font-size: 16px; color: #fff; background: #f5a623; }
-    .minus { background: #e74c3c; }
+    button.b { border: 0; border-radius: 6px; padding: 6px 10px;
+               font-size: 16px; color: #fff; background: #f5a623; }
+    button.minus { background: #e74c3c; }
     .qty { display: inline-block; min-width: 20px; }
+    .row { display: flex; justify-content: space-between; padding: 10px 0;
+           border-bottom: 1px solid #8884; }
+    .head { display: flex; justify-content: space-between; align-items: center; }
+    .link { color: #2ea043; cursor: pointer; }
+    textarea { width: 100%; box-sizing: border-box; margin-top: 14px;
+               padding: 8px; font-size: 15px; border-radius: 6px;
+               border: 1px solid #8886; min-height: 70px; }
   </style>
 </head>
 <body>
-  <h2>Durger King</h2>
-  <div class="grid" id="menu"></div>
+  <div id="app"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
 
-    // Menyu ma'lumotlari. Narxlar markazda (sentda) saqlanadi.
+    // Narxlar sentda: 499 = $4.99
     const items = [
       { id: "burger", name: "Burger", emoji: "🍔", price: 499 },
       { id: "fries",  name: "Fries",  emoji: "🍟", price: 149 },
@@ -39,54 +45,101 @@
       { id: "coke",   name: "Coke",   emoji: "🥤", price: 149 },
     ];
 
-    const cart = {};  // masalan: { burger: 1, fries: 10 }
+    const cart = {};       // { burger: 1, fries: 10 }
+    let screen = "menu";   // "menu" yoki "order"
+    const app = document.getElementById("app");
 
-    function render() {
+    const money = c => "$" + (c / 100).toFixed(2);
+    const total = () =>
+      items.reduce((s, it) => s + (cart[it.id] || 0) * it.price, 0);
+
+    function change(id, delta) {
+      cart[id] = Math.max(0, (cart[id] || 0) + delta);
+      if (cart[id] === 0) delete cart[id];
+      renderMenu();
+    }
+
+    function setScreen(s) {
+      screen = s;
+      if (s === "menu") renderMenu(); else renderOrder();
+    }
+
+    // ---------- 1-ekran: menyu ----------
+    function renderMenu() {
+      app.innerHTML = "<h2>Durger King</h2><div class='grid' id='menu'></div>";
       const menu = document.getElementById("menu");
-      menu.innerHTML = "";
       items.forEach(it => {
         const qty = cart[it.id] || 0;
         const div = document.createElement("div");
         div.className = "item";
         div.innerHTML =
-          '<div class="emoji">' + it.emoji + '</div>' +
-          '<div>' + it.name + ' · $' + (it.price / 100).toFixed(2) + '</div>' +
-          '<div class="controls">' +
-            (qty === 0
-              ? '<button onclick="change(\'' + it.id + '\', 1)">ADD</button>'
-              : '<button class="minus" onclick="change(\'' + it.id + '\', -1)">−</button> ' +
-                '<span class="qty">' + qty + '</span> ' +
-                '<button onclick="change(\'' + it.id + '\', 1)">+</button>') +
-          '</div>';
+          "<div class='emoji'>" + it.emoji + "</div>" +
+          "<div>" + it.name + " · " + money(it.price) + "</div>" +
+          "<div class='controls'></div>";
+        const ctr = div.querySelector(".controls");
+
+        const plus = document.createElement("button");
+        plus.className = "b";
+        plus.textContent = qty === 0 ? "ADD" : "+";
+        plus.onclick = () => change(it.id, 1);
+
+        if (qty > 0) {
+          const minus = document.createElement("button");
+          minus.className = "b minus";
+          minus.textContent = "−";
+          minus.onclick = () => change(it.id, -1);
+          const q = document.createElement("span");
+          q.className = "qty";
+          q.textContent = " " + qty + " ";
+          ctr.append(minus, q, plus);
+        } else {
+          ctr.append(plus);
+        }
         menu.appendChild(div);
       });
-      updateMainButton();
-    }
 
-    function change(id, delta) {
-      cart[id] = Math.max(0, (cart[id] || 0) + delta);
-      if (cart[id] === 0) delete cart[id];
-      render();
-    }
-
-    function total() {
-      return items.reduce((s, it) => s + (cart[it.id] || 0) * it.price, 0);
-    }
-
-    function updateMainButton() {
+      tg.BackButton.hide();
       if (total() > 0) {
-        tg.MainButton.setText("VIEW ORDER · $" + (total() / 100).toFixed(2));
+        tg.MainButton.setText("VIEW ORDER · " + money(total()));
         tg.MainButton.show();
       } else {
         tg.MainButton.hide();
       }
     }
 
-    tg.MainButton.onClick(() => {
-      alert("Savat: " + JSON.stringify(cart));  // keyingi bosqichda botga yuboramiz
-    });
+    // ---------- 2-ekran: buyurtma ----------
+    function renderOrder() {
+      let rows = "";
+      items.forEach(it => {
+        const q = cart[it.id];
+        if (q) {
+          rows += "<div class='row'><div><b>" + it.name + "</b> " + q + "x</div>" +
+                  "<div>" + money(q * it.price) + "</div></div>";
+        }
+      });
+      app.innerHTML =
+        "<div class='head'><h2>YOUR ORDER</h2>" +
+        "<span class='link' id='edit'>Edit</span></div>" + rows +
+        "<textarea id='comment' placeholder='Izoh qoldiring...'></textarea>";
+      document.getElementById("edit").onclick = () => setScreen("menu");
 
-    render();
+      tg.BackButton.show();
+      tg.MainButton.setText("PAY " + money(total()));
+      tg.MainButton.show();
+    }
+
+    // ---------- tugmalar ----------
+    tg.MainButton.onClick(() => {
+      if (screen === "menu") {
+        setScreen("order");
+      } else {
+        const comment = document.getElementById("comment").value;
+        tg.sendData(JSON.stringify({ cart: cart, comment: comment }));
+      }
+    });
+    tg.BackButton.onClick(() => setScreen("menu"));
+
+    renderMenu();
   </script>
 </body>
 </html>
