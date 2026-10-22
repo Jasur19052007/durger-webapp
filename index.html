@@ -123,40 +123,41 @@
     tg.expand();
 
     // Restoran darajasidagi kengaytirilgan menyu (narxlar so'mda)
+    // Bazadagi ID'larga mos raqamli ID'lar
     const items = [
       // Burgerlar
-      { id: "king_burger", cat: "burger", name: "King Double Burger", emoji: "🍔", price: 38000 },
-      { id: "cheeseburger", cat: "burger", name: "Classic Cheeseburger", emoji: "🧀", price: 26000 },
-      { id: "chicken_burger", cat: "burger", name: "Crispy Chicken Burger", emoji: "🍗", price: 28000 },
-      { id: "mushroom_burger", cat: "burger", name: "Mushroom Swiss Burger", emoji: "🍄", price: 34000 },
-      { id: "bbq_burger", cat: "burger", name: "BBQ Bacon Burger", emoji: "🥓", price: 36000 },
+      { id: 1, cat: "burger", name: "King Double Burger", emoji: "🍔", price: 38000 },
+      { id: 2, cat: "burger", name: "Classic Cheeseburger", emoji: "🧀", price: 26000 },
+      { id: 3, cat: "burger", name: "Crispy Chicken Burger", emoji: "🍗", price: 28000 },
+      { id: 4, cat: "burger", name: "Mushroom Swiss Burger", emoji: "🍄", price: 34000 },
+      { id: 5, cat: "burger", name: "BBQ Bacon Burger", emoji: "🥓", price: 36000 },
 
       // Setlar
-      { id: "big_set", cat: "sets", name: "Mega King Set", emoji: "👑", price: 65000 },
-      { id: "junior_set", cat: "sets", name: "Junior Box Set", emoji: "🎁", price: 42000 },
-      { id: "chicken_set", cat: "sets", name: "Chicken Wings Set", emoji: "🔥", price: 55000 },
+      { id: 6, cat: "sets", name: "Mega King Set", emoji: "👑", price: 65000 },
+      { id: 7, cat: "sets", name: "Junior Box Set", emoji: "🎁", price: 42000 },
+      { id: 8, cat: "sets", name: "Chicken Wings Set", emoji: "🔥", price: 55000 },
 
       // Fri va Gazaklar
-      { id: "fries_big", cat: "snacks", name: "French Fries (Big)", emoji: "🍟", price: 12000 },
-      { id: "nuggets", cat: "snacks", name: "Chicken Nuggets (9 pcs)", emoji: "🐔", price: 25000 },
-      { id: "onion_rings", cat: "snacks", name: "Onion Rings", emoji: "🧅", price: 15000 },
-      { id: "cheese_sticks", cat: "snacks", name: "Mozzarella Sticks", emoji: "🧀", price: 22000 },
+      { id: 9, cat: "snacks", name: "French Fries (Big)", emoji: "🍟", price: 12000 },
+      { id: 10, cat: "snacks", name: "Chicken Nuggets (9 pcs)", emoji: "🐔", price: 25000 },
+      { id: 11, cat: "snacks", name: "Onion Rings", emoji: "🧅", price: 15000 },
+      { id: 12, cat: "snacks", name: "Mozzarella Sticks", emoji: "🧀", price: 22000 },
 
       // Ichimliklar
-      { id: "coca_cola", cat: "drinks", name: "Coca-Cola 0.5L", emoji: "🥤", price: 9000 },
-      { id: "fanta", cat: "drinks", name: "Fanta 0.5L", emoji: "🍊", price: 9000 },
-      { id: "sprite", cat: "drinks", name: "Sprite 0.5L", emoji: "❄️", price: 9000 },
-      { id: "americano", cat: "drinks", name: "Hot Americano", emoji: "☕", price: 14000 },
+      { id: 13, cat: "drinks", name: "Coca-Cola 0.5L", emoji: "🥤", price: 9000 },
+      { id: 14, cat: "drinks", name: "Fanta 0.5L", emoji: "🍊", price: 9000 },
+      { id: 15, cat: "drinks", name: "Sprite 0.5L", emoji: "❄️", price: 9000 },
+      { id: 16, cat: "drinks", name: "Hot Americano", emoji: "☕", price: 14000 },
 
       // Souslar
-      { id: "cheese_sauce", cat: "sauces", name: "Cheese Sauce", emoji: "🧀", price: 4000 },
-      { id: "garlic_sauce", cat: "sauces", name: "Garlic Sauce", emoji: "🧄", price: 4000 },
-      { id: "bbq_sauce", cat: "sauces", name: "BBQ Sauce", emoji: "🍅", price: 4000 },
+      { id: 17, cat: "sauces", name: "Cheese Sauce", emoji: "🧀", price: 4000 },
+      { id: 18, cat: "sauces", name: "Garlic Sauce", emoji: "🧄", price: 4000 },
+      { id: 19, cat: "sauces", name: "BBQ Sauce", emoji: "🍅", price: 4000 },
 
       // Desertlar
-      { id: "ice_cream", cat: "desserts", name: "King Ice Cream", emoji: "🍦", price: 15000 },
-      { id: "donut", cat: "desserts", name: "Chocolate Donut", emoji: "🍩", price: 12000 },
-      { id: "cheesecake", cat: "desserts", name: "Strawberry Cheesecake", emoji: "🍰", price: 24000 },
+      { id: 20, cat: "desserts", name: "King Ice Cream", emoji: "🍦", price: 15000 },
+      { id: 21, cat: "desserts", name: "Chocolate Donut", emoji: "🍩", price: 12000 },
+      { id: 22, cat: "desserts", name: "Strawberry Cheesecake", emoji: "🍰", price: 24000 }
     ];
 
     const categories = [
